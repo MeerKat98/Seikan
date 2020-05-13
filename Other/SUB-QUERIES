@@ -1,17 +1,44 @@
 --query 1
+--first sub query allows you to select all data from the dock_manifest with a manifest id between 1 or more values.
 SELECT * FROM DOCK_MANIFEST WHERE DOCKINGID IN 
   (SELECT DOCKINGID FROM DOCK_MANIFEST WHERE MANIFESTID<12 AND MANIFESTID>8);
 
 --query 2
+--query 2 allows you to select manifest id's from containers with a particular weight and cargo type
 SELECT DISTINCT CONTAINERID, WEIGHT FROM MANIFEST_CONTAINER WHERE CONTAINERID IN 
   (SELECT DISTINCT WEIGHT FROM MANIFEST_CONTAINER WHERE WEIGHT<12 AND CARGOTYPE='Broadcasting');
 
 --query 3
+--This sub query will allow you to find the manifestid and docking id of manifests that arrive and depart between specified dates
 SELECT DOCKINGID, MANIFESTID FROM DOCK_MANIFEST WHERE ARRIVALTIME IN
   (SELECT ARRIVALTIME FROM DOCK_MANIFEST WHERE DEPARTURETIME BETWEEN '22/FEB/2017' AND '25/FEB/2017');
 
 --query 4
+--this query allows you to find the details of ships which belong to any given company
 SELECT * FROM SHIP WHERE SHIPCOMPANY IN
     (SELECT SHIPCOMPANY FROM SHIP WHERE SHIPCOMPANY='Pacific International Line' OR SHIPCOMPANY='Hyundai Merchant Marine');
 
 --query 5
+--This query allows you to update the company of a ship
+UPDATE SHIP
+SET SHIPCOMPANY='NEW NAME COMPANY'
+WHERE SHIPID IN
+(SELECT SHIPID FROM SHIP WHERE SHIPID=1);
+
+--query 6
+--This query allows the weight of containers to be changed
+UPDATE MANIFEST_CONTAINER
+SET WEIGHT=150
+WHERE CONTAINERID IN
+(SELECT CONTAINERID FROM MANIFEST_CONTAINER WHERE CONTAINERID = 1);
+
+--query 7
+--allows spaceport_location to be renamed
+UPDATE SPACEPORT_LOCATION 
+SET LOCATIONNAME = 'MY FIRST SPACE STATION'
+WHERE LOCATIONID IN
+    (SELECT LOCATIONID FROM SPACEPORT_LOCATION WHERE LOCATIONID=1);
+
+
+
+
