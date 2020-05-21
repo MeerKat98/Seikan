@@ -37,3 +37,23 @@ ORDER BY
 --REPLACE:  TRUNC(CURRENT_DATE)
 --WITH:     TO_DATE('2020/05/13','YYYY/MM/DD')
 --TO:       Test query with any date other than todays date
+
+--ALL SHIPS ARRIVING WITHIN A CERTAIN TIME
+SELECT * FROM
+(SHIP_MANIFEST INNER JOIN ship ON ship.shipid = ship_manifest.shipid)
+    INNER JOIN dock_manifest ON ship_manifest.MANIFESTID = dock_manifest.MANIFESTID
+WHERE dock_manifest.arrivaltime BETWEEN TO_DATE('2020-JAN-01', 'YYYY-MON-DD') AND TO_DATE('2020-JAN-05', 'YYYY-MON-DD');
+
+--COUNT OF SHIPS ARRIVING WITHIN A CERTAIN TIME BY COMPANY /// maybe add leaving times too?
+SELECT SHIP.SHIPCOMPANY, COUNT(*) FROM
+(SHIP_MANIFEST INNER JOIN ship ON ship.shipid = ship_manifest.shipid)
+    INNER JOIN dock_manifest ON ship_manifest.MANIFESTID = dock_manifest.MANIFESTID
+WHERE dock_manifest.arrivaltime BETWEEN TO_DATE('2020-JAN-01', 'YYYY-MON-DD') AND TO_DATE('2020-JAN-05', 'YYYY-MON-DD')
+GROUP BY ship.shipcompany;
+
+--TOTAL WEIGHT OF CARGO BEING CARRIED BY A SHIP AND NUMBER OF CONTAINER
+SELECT ship_manifest.manifestid, ship.shipid, ship.shipname, sum(weight) "Total Weight", count(manifest_container.containerid) "Number of Containers", ship.shipcompany FROM
+(manifest_container INNER JOIN ship_manifest ON ship_manifest.manifestid = manifest_container.manifestid)
+    INNER JOIN ship ON ship_manifest.shipid = ship.shipid   
+    GROUP BY ship_manifest.manifestid, ship.shipname, ship.shipid, ship.shipcompany;
+    
